@@ -1,26 +1,100 @@
-def filter_vowels(word) -> list:
-    vowels = ['a', 'e', 'i', 'o', 'u', 'ie']
-    char_list = []
-    consonant_list = []
+import requests
 
+def etympoligical_origin(word: str) -> int:
+    """
+    Checks if a word is of Semitic, Romance, or English origin.
+
+    0 -> Unknown
+    1 -> Semitic
+    2 -> Romance
+    3 -> English
+    """
+
+    url = f"https://en.wiktionary.org/wiki/{word}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        text = response.text
+        if "Semitic" in text:
+            return 1
+        elif "Romance" in text or "Latin" in text or "Italian" in text:
+            return 2
+        elif "English" in text or "Old English" in text:
+            return 3
+    return 0
+
+def filter_word(word: str) -> list:
+    """
+    Retruns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
+    """
+    # Lists to be used later
+    vowels         = ['a', 'e', 'i', 'o', 'u', 'ie']
+    char_list      = []
+    filtered_word  = []
+    vowels_removed = []
+
+    # Take care of 'ie' and 'għ' to put them in one element
     i = 0
     while i < len(word):
         if word[i:i+2] == 'ie':
             char_list.append('ie')
             i += 2
+        elif word[i:i+2] == 'għ':
+            char_list.append('għ')
+            i += 2
         else:
             char_list.append(word[i])
             i += 1
 
-    for ch in char_list:
-        if ch not in vowels:
-            consonant_list.append(ch)
+    # Remove Vowels
+    for i in char_list:
+        if i not in vowels:
+            vowels_removed.append(i)
 
-    return consonant_list
+    # Remove Duplicate Consonants
+    for i in range(len(vowels_removed)):
+        if i == 0 or vowels_removed[i] != vowels_removed[i-1]:
+            filtered_word.append(vowels_removed[i])
 
-def stemmer(word):
-    root = " "
+    # Nom mimmat (m is the first consonant)
+    if filtered_word[0] == 'm':
+        filtered_word = filtered_word[1:]
 
-    return root
+    # Remove 'st'
+    if filtered_word[:2] == ['s', 't']:
+        filtered_word = filtered_word[2:]
 
-print(filter_vowels("ġirja"))
+    return filtered_word
+
+def find_root(filtered_word: list) -> str:
+    """
+    Extracts the probable għerq (root) of a Maltese word given only its consonants.
+    
+    The root is usually a three-consonant sequence.
+    """
+
+    if len(filtered_word) >= 3:
+        return filtered_word[:3]  # Take the first three consonants as an approximation
+    return filtered_word  # Return as is if less than 3 consonants
+
+def stemmer(word: str):
+    """
+    TO IMPLEMENNT
+    """
+
+    # Check if the word is of Semitic, Romance, or English origin
+    origin = etympoligical_origin(word)
+
+    if (origin == 1): # Semitic
+        filtered_word = filter_word(word)
+        root = find_root(filtered_word)
+        return root
+
+    return "ERROR: could not stem the word"
+
+
+# ------------------ TESTING ------------------ 
+i = 0
+while i < 10:
+    print(stemmer(input()))
+    print()
