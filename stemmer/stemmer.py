@@ -69,12 +69,10 @@ def filter_word(word: str) -> list:
 def find_root(filtered_word: list) -> str:
     """
     Extracts the probable għerq (root) of a Maltese word given only its consonants.
-    
-    The root is usually a three-consonant sequence.
     """
 
-    if len(filtered_word) >= 3:
-        return filtered_word[:3]  # Take the first three consonants as an approximation
+    if len(filtered_word) >= 4:
+        return filtered_word[:4]  # Take the first three consonants as an approximation
     return filtered_word  # Return as is if less than 3 consonants
 
 def stemmer(word: str):
@@ -82,15 +80,20 @@ def stemmer(word: str):
     TO IMPLEMENNT
     """
 
-    # Check if the word is of Semitic, Romance, or English origin
     origin = etympoligical_origin(word)
 
     if (origin == 1): # Semitic
         filtered_word = filter_word(word)
         root = find_root(filtered_word)
         return root
-
-    return "ERROR: could not stem the word"
+    elif (origin == 2): # Romance
+        return "ERROR: Romance words are not supported yet"
+    elif (origin == 3): # English
+        return "ERROR: English words are not supported yet"
+    elif (origin == 0): # Unknown
+        return "ERROR: could not find word origin"
+    
+    return "ERROR: something went wrong"
 
 
 # ------------------ TESTING ------------------ 
