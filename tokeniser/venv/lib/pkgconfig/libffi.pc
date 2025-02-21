@@ -1,0 +1,11 @@
+prefix=/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/tokeniser/venv
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+toolexeclibdir=${libdir}
+includedir=/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/tokeniser/venv/include
+
+Name: libffi
+Description: Library supporting Foreign Function Interfaces
+Version: 3.4.4
+Libs: -L${toolexeclibdir} -lffi
+Cflags: -I${includedir}
