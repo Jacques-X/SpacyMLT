@@ -4,4 +4,4 @@ sentence = ["Bonġu", "kif", "int", "jien", "jisimni", "Jacques", "u", "qiegħed
 returned = []
 
 for i in sentence:
-    print(str(i) + " -- " + st.stemmer(i))
+    print(str(i) + " -- " + st.stemm(i))

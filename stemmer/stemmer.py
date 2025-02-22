@@ -1,6 +1,6 @@
 import requests
 
-def etympoligical_origin(word: str) -> int:
+def etympoligical_origin(word: str) -> int: # Implemented using lookup
     """
     Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliža.
     Checks if a word is of Semitic, Romance, or English origin.
@@ -11,7 +11,7 @@ def etympoligical_origin(word: str) -> int:
     3 -> English
     """
 
-    url = f"https://en.wiktionary.org/wiki/{word}#Maltese"
+    url = f"https://en.wiktionary.org/wiki/{word}#Maltese" # force it to seach in the Maltese section
     response = requests.get(url, timeout=5)  # timeout to prevent hanging
 
     if response.status_code == 200:
@@ -41,7 +41,7 @@ def pre_process(word: str) -> str:
         
     return word
 
-def filter_word(word: str) -> list:
+def filter_word_semitic(word: str) -> list:
     """
     Jġġati lura listaa fejn il-vokali u l-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
     Returns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
@@ -91,7 +91,7 @@ def filter_word(word: str) -> list:
 
     return filtered_word
 
-def find_root(filtered_word: list) -> str:
+def find_root_semitic(filtered_word: list) -> str:
     """
     Joħroġ ħerq probabbli tal-kelmata Maltija billi jingħata l-konsonanti tagħha biss.
     Extracts the probable root of a Maltese word given only its consonants.
@@ -104,7 +104,7 @@ def find_root(filtered_word: list) -> str:
 
     return "".join(filtered_word)
 
-def stemmer(word: str) -> str:
+def stemm(word: str) -> str:
     """
     TO IMPLEMENT
     """
@@ -114,8 +114,8 @@ def stemmer(word: str) -> str:
     origin = etympoligical_origin(word)
 
     if origin == 1: # Semitic
-        filtered_word = filter_word(word)
-        root = find_root(filtered_word)
+        filtered_word = filter_word_semitic(word)
+        root = find_root_semitic(filtered_word)
         return root
     elif origin == 2: # Romance
         return "ERROR: Romance words are not supported yet"
