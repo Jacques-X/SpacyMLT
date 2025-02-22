@@ -12,7 +12,7 @@ def etympoligical_origin(word: str) -> int:
     """
 
     url = f"https://en.wiktionary.org/wiki/{word}#Maltese"
-    response = requests.get(url, timeout=5)  # Added timeout to prevent hanging
+    response = requests.get(url, timeout=5)  # timeout to prevent hanging
 
     if response.status_code == 200:
         text = response.text
@@ -24,16 +24,20 @@ def etympoligical_origin(word: str) -> int:
             return 3
     return 0
 
-def remove_article(word: str) -> str:
+def pre_process(word: str) -> str:
     """
     Jġġati lura il-kelma mingħajr l-artikolu.
     Returns the word without the article.
     """
-    articles = ['l-', 'il-', 'iċ-', 'iż-', 'id-,', 'in-', 'ir-', 'is-', 'it-', 'ix-', 'iż-']
+    articles = ['l-', 'il-', 'iċ-', 'iż-', 'id-,', 'in-', 'ir-', 'is-', 'it-', 'ix-', 'iż-', "f'"]
 
     for article in articles:
         if word.startswith(article):
             return word[len(article):]
+        
+    # Capitalisation
+    if word[0].isupper():
+        word = word.lower()
         
     return word
 
@@ -104,7 +108,7 @@ def stemmer(word: str) -> str:
     """
     root   = ""
 
-    word   = remove_article(word) # Can't find the origin with the article
+    word   = pre_process(word) # Can't find the origin with the article or capitalisation
     origin = etympoligical_origin(word)
 
     if origin == 1: # Semitic
