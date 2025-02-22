@@ -16,7 +16,7 @@ def etympoligical_origin(word: str) -> int:
 
     if response.status_code == 200:
         text = response.text
-        if "Semitic" in text:
+        if "Semitic" in text or "Arabic" in text or "Hebrew" in text:
             return 1
         elif "Romance" in text or "Latin" in text or "Italian" in text or "Sicilian" in text:
             return 2
