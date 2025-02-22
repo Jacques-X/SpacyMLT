@@ -2,7 +2,7 @@ import requests
 
 def etympoligical_origin(word: str) -> int:
     """
-    Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliża.
+    Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliža.
     Checks if a word is of Semitic, Romance, or English origin.
 
     0 -> Unknown
@@ -12,7 +12,7 @@ def etympoligical_origin(word: str) -> int:
     """
 
     url = f"https://en.wiktionary.org/wiki/{word}"
-    response = requests.get(url)
+    response = requests.get(url, timeout=5)  # Added timeout to prevent hanging
 
     if response.status_code == 200:
         text = response.text
@@ -24,29 +24,48 @@ def etympoligical_origin(word: str) -> int:
             return 3
     return 0
 
+def remove_article(word: str) -> str:
+    """
+    Jġġati lura il-kelma mingħajr l-artikolu.
+    Returns the word without the article.
+    """
+    articles = ['l-', 'il-', 'iċ-', 'iż-', 'id-,', 'in-', 'ir-', 'is-', 'it-', 'ix-', 'iż-']
+
+    for article in articles:
+        if word.startswith(article):
+            return word[len(article):]
+        
+    return word
+
 def filter_word(word: str) -> list:
     """
-    Jgħati lura listaa fejn il-vokali u l-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
-    Retruns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
+    Jġġati lura listaa fejn il-vokali u l-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
+    Returns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
     """
-    # Lists to be used later
-    vowels         = ['a', 'e', 'i', 'o', 'u', 'ie']
+    vowels         = ['a', 'e', 'i', 'o', 'u', 'ie', 'à']
+    
     char_list      = []
-    filtered_word  = []
     vowels_removed = []
+    filtered_word  = []
 
-    # Take care of 'ie' and 'għ' to put them in one element
+    # Take care of "ie", "għ" and "a'" to put them in one element
     i = 0
     while i < len(word):
-        if word[i:i+2] == 'ie':
-            char_list.append('ie')
+        if word[i:i+2] == "ie":
+            char_list.append("ie")
             i += 2
-        elif word[i:i+2] == 'għ':
-            char_list.append('għ')
+        elif word[i:i+2] == "għ":
+            char_list.append("għ")
             i += 2
+        elif word[i:i+2] == "a'":
+            char_list.append("à")
         else:
             char_list.append(word[i])
             i += 1
+
+    # Turn "'" at the end of a word into "għ"
+    if char_list and char_list[-1] == "'": 
+        char_list[-1] = "għ"
 
     # Remove Vowels
     for i in char_list:
@@ -59,7 +78,7 @@ def filter_word(word: str) -> list:
             filtered_word.append(vowels_removed[i])
 
     # Nom mimmat (m is the first consonant)
-    if filtered_word[0] == 'm':
+    if filtered_word and filtered_word[0] == 'm': 
         filtered_word = filtered_word[1:]
 
     # Remove 'st'
@@ -70,37 +89,33 @@ def filter_word(word: str) -> list:
 
 def find_root(filtered_word: list) -> str:
     """
-    Joħroġ għerq probabbli tal-kelmata Maltija billi jingħata l-konsonanti tagħha biss.
+    Joħroġ ħerq probabbli tal-kelmata Maltija billi jingħata l-konsonanti tagħha biss.
     Extracts the probable root of a Maltese word given only its consonants.
     """
 
     if len(filtered_word) >= 4:
-        return filtered_word[:4]  # Take the first three consonants as an approximation
-    return filtered_word  # Return as is if less than 3 consonants
+        return "".join(filtered_word[:4]) 
 
-def stemmer(word: str):
-    """
-    TO IMPLEMENNT
-    """
+    return "".join(filtered_word)
 
+def stemmer(word: str) -> str:
+    """
+    TO IMPLEMENT
+    """
+    root   = ""
+
+    word   = remove_article(word) # Can't find the origin with the article
     origin = etympoligical_origin(word)
 
-    if (origin == 1): # Semitic
+    if origin == 1: # Semitic
         filtered_word = filter_word(word)
         root = find_root(filtered_word)
         return root
-    elif (origin == 2): # Romance
+    elif origin == 2: # Romance
         return "ERROR: Romance words are not supported yet"
-    elif (origin == 3): # English
+    elif origin == 3: # English
         return "ERROR: English words are not supported yet"
-    elif (origin == 0): # Unknown
+    elif origin == 0: # Unknown
         return "ERROR: could not find word origin"
     
     return "ERROR: something went wrong"
-
-
-# ------------------ TESTING ------------------ 
-i = 0
-while i < 10:
-    print(stemmer(input()))
-    print()
