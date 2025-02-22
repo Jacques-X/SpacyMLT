@@ -29,7 +29,7 @@ def pre_process(word: str) -> str:
     Jġġati lura il-kelma mingħajr l-artikolu.
     Returns the word without the article.
     """
-    articles = ['l-', 'il-', 'iċ-', 'iż-', 'id-,', 'in-', 'ir-', 'is-', 'it-', 'ix-', 'iż-', "f'"]
+    articles = ['l-', 'il-', 'iċ-', 'iż-', 'id-,', 'in-', 'ir-', 'is-', 'it-', 'ix-', 'iż-', "f'", "tal-", "dal-"]
 
     for article in articles:
         if word.startswith(article):
@@ -99,6 +99,8 @@ def find_root(filtered_word: list) -> str:
 
     if len(filtered_word) >= 4:
         return "".join(filtered_word[:4]) 
+    
+    # Add dashes between letters--------------------------------------------------------
 
     return "".join(filtered_word)
 
