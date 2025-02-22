@@ -2,6 +2,7 @@ import requests
 
 def etympoligical_origin(word: str) -> int:
     """
+    Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliża.
     Checks if a word is of Semitic, Romance, or English origin.
 
     0 -> Unknown
@@ -25,6 +26,7 @@ def etympoligical_origin(word: str) -> int:
 
 def filter_word(word: str) -> list:
     """
+    Jgħati lura listaa fejn il-vokali u l-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
     Retruns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
     """
     # Lists to be used later
@@ -68,7 +70,8 @@ def filter_word(word: str) -> list:
 
 def find_root(filtered_word: list) -> str:
     """
-    Extracts the probable għerq (root) of a Maltese word given only its consonants.
+    Joħroġ għerq probabbli tal-kelmata Maltija billi jingħata l-konsonanti tagħha biss.
+    Extracts the probable root of a Maltese word given only its consonants.
     """
 
     if len(filtered_word) >= 4:
