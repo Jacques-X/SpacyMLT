@@ -11,14 +11,14 @@ def etympoligical_origin(word: str) -> int:
     3 -> English
     """
 
-    url = f"https://en.wiktionary.org/wiki/{word}"
+    url = f"https://en.wiktionary.org/wiki/{word}#Maltese"
     response = requests.get(url, timeout=5)  # Added timeout to prevent hanging
 
     if response.status_code == 200:
         text = response.text
         if "Semitic" in text:
             return 1
-        elif "Romance" in text or "Latin" in text or "Italian" in text:
+        elif "Romance" in text or "Latin" in text or "Italian" in text or "Sicilian" in text:
             return 2
         elif "English" in text or "Old English" in text:
             return 3
@@ -79,7 +79,7 @@ def filter_word(word: str) -> list:
 
     # Nom mimmat (m is the first consonant)
     if filtered_word and filtered_word[0] == 'm': 
-        filtered_word = filtered_word[1:]
+        filtered_word = filtered_word[1:] 
 
     # Remove 'st'
     if filtered_word[:2] == ['s', 't']:
