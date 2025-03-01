@@ -6,6 +6,7 @@ from   sklearn.metrics            import accuracy_score, classification_report
 from   sklearn.feature_extraction import DictVectorizer
 from   conllu                     import parse_incr
 from   sklearn.svm                import SVC
+from   pathlib                    import Path
 import pandas                     as pd
 import warnings
 import joblib
@@ -13,10 +14,13 @@ import joblib
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-# Paths
-TRAIN_PATH = '/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/svm_pos/datasets/mt_mudt-ud-train.conllu'
-TEST_PATH  = '/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/svm_pos/datasets/mt_mudt-ud-test.conllu'
-DEV_PATH   = '/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/svm_pos/datasets/mt_mudt-ud-dev.conllu'
+BASE_DIR = Path(__file__).resolve().parent # Gets the base directory of the script itself
+
+# Paths - changed to work relatively to the local PC
+TRAIN_PATH = BASE_DIR / 'datasets' / 'mt_mudt-ud-train.conllu'
+TEST_PATH  = BASE_DIR / 'datasets' / 'mt_mudt-ud-test.conllu'
+DEV_PATH   = BASE_DIR / 'datasets' / 'mt_mudt-ud-dev.conllu'
+DUMP_PATH  = BASE_DIR / 'svm_pos_model.joblib'
 
 # Load data
 def load_data(path):
@@ -57,7 +61,7 @@ def train_model():
     y_pred = svm_clf.predict(X_test_vec)
 
     print("Saving model...")
-    joblib.dump(svm_clf, '/Users/jacquesx/My Drive/Semester 2/ICS2000- GAPT/SpacyMLT/svm_pos/svm_pos_model.joblib')
+    joblib.dump(svm_clf, DUMP_PATH)
 
     # Evaluation
     print("Accuracy:", accuracy_score(y_test, y_pred))
