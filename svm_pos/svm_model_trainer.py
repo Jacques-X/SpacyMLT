@@ -36,7 +36,9 @@ def vectorizer(X_train, X_test):
     vec = DictVectorizer()
     X_train = X_train.to_dict(orient="records")
     X_test = X_test.to_dict(orient="records")
-    return vec.fit_transform(X_train), vec.transform(X_test)
+    X_train_vec = vec.fit_transform(X_train)
+    X_test_vec = vec.transform(X_test)
+    return X_train_vec, X_test_vec, vec  # Returns the vectorizer itself
 
 def train_model():
     print("Loading training data...")
@@ -51,7 +53,7 @@ def train_model():
     y_train, y_test = df_train["upos"], df_test["upos"]
 
     print("Vectorizing data...")
-    X_train_vec, X_test_vec = vectorizer(X_train, X_test)
+    X_train_vec, X_test_vec, vec = vectorizer(X_train, X_test)
 
     print("Training SVM classifier...")
     svm_clf = SVC(kernel='linear', C=1.0)
@@ -62,6 +64,7 @@ def train_model():
 
     print("Saving model...")
     joblib.dump(svm_clf, DUMP_PATH)
+    joblib.dump(vec, BASE_DIR / 'vectorizer.joblib') # Added vectorizer as it is important to load POS tagger
 
     # Evaluation
     print("Accuracy:", accuracy_score(y_test, y_pred))
