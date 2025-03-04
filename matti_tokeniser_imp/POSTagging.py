@@ -3,6 +3,8 @@ import joblib
 from pathlib import Path
 
 """
+DEPENDENCY: pip install malti
+
 This is a Pipeline class that can be used to call the POS tagger for use with the Lemmatizer
 """
 
