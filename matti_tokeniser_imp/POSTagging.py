@@ -1,6 +1,6 @@
+from   pathlib         import Path
 import malti.tokeniser as mlt
 import joblib
-from pathlib import Path
 
 """
 DEPENDENCY: pip install malti
