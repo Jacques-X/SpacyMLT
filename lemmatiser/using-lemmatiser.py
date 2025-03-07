@@ -1,6 +1,6 @@
 import lemmatiser as l
 
-string = "Bonġu, din is-sentenza hi biss sabiex nara l-kapaċita tat-tokeniser tal-Malti."
+string = "Bonġu, din is-sentenza hi biss biex nara l-kapaċita tat-tokeniser tal-Malti."
 
 lemmatised_tokens = l.lemmatise(string)
 print()

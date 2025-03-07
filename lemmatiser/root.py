@@ -82,16 +82,40 @@ def filter_word_semitic(token: str) -> list:
 
 def find_root_semitic(token: list) -> str:
     """
-    Joħroġ ħerq probabbli tal-kelmata Maltija billi jingħata l-konsonanti tagħha biss.
+    Joħroġ għerq probabbli tal-kelmaa Maltija billi jingħata l-konsonanti tagħha biss.
     Extracts the probable root of a Maltese word given only its consonants.
     """
 
     if len(token) >= 4:
-        return "".join(token[:4]) 
-    
-    # Add dashes between letters--------------------------------------------------------
+        return "".join(token[:4])
 
     return "".join(token)
+
+def find_root_rom_eng(token: str) -> str:
+    """
+    Joħroġ iz-zokk morfemiku probabbli tal-kelma Maltija..
+    Extracts the probable root of a Maltese.
+    """
+    root = ""
+
+    prefixes = ["ik", "jik", "j", "ip", "jip"]
+    suffixes = ["iet", "i", "joni", "ent", "a", "at", "anti", "aw", "i", "atur", "tat", "azzjoni"]
+
+    if len(token) >= 4:
+        for prefix in prefixes:
+            if token.startswith(prefix):
+                root = token[len(prefix):]
+                break
+
+        for suffix in suffixes:
+            if token.endswith(suffix):
+                root = token[:-len(suffix)]
+                break
+        
+    if root == "":
+        root = token
+
+    return root
 
 def find_root(token: str) -> str:
     """
@@ -105,10 +129,9 @@ def find_root(token: str) -> str:
         filtered_token = filter_word_semitic(token)
         root = find_root_semitic(filtered_token)
         return root
-    elif origin == 2: # Romance
-        return "ERROR: Romance words are not supported yet"
-    elif origin == 3: # English
-        return "ERROR: English words are not supported yet"
+    elif origin == 2 or origin == 3: # Romance and English
+        root = find_root_rom_eng(token)
+        return root 
     elif origin == 4: # Article
         return token
     elif origin == 0: # Unknown
