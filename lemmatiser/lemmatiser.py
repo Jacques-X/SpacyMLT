@@ -47,6 +47,8 @@ def lemmatise(sentence: str) -> list:
     Lemmatizza s-sentenza b'sett ta' regoli.
     Lemmatise the sentence using a rule-based approach.
     """
+    print("Lemmatising...")
+
     tokens = mlt.tokenise(sentence)
     filtered_tokens = filter_tokens(tokens)
 
@@ -56,12 +58,3 @@ def lemmatise(sentence: str) -> list:
     roots = [r.find_root(token) for token in filtered_tokens]
     tagged_sentence = list(zip(roots, pos_tags))
     return tagged_sentence
-
-# ------------------ TESTING ------------------ 
-string = "Bonġu, din is-sentenza hi biss sabiex nara l-kapaċita tat-tokeniser tal-Malti."
-print("Lemmatising...")
-lemmatised_tokens = lemmatise(string)
-print()
-print(string)
-print()
-print(lemmatised_tokens)
