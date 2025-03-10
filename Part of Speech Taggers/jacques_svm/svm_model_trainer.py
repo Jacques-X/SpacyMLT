@@ -17,9 +17,13 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 BASE_DIR = Path(__file__).resolve().parent # Gets the base directory of the script itself
 
 # Paths - changed to work relatively to the local PC
-TRAIN_PATH = BASE_DIR / 'datasets' / 'mt_mudt-ud-train.conllu'
-TEST_PATH  = BASE_DIR / 'datasets' / 'mt_mudt-ud-test.conllu'
-DEV_PATH   = BASE_DIR / 'datasets' / 'mt_mudt-ud-dev.conllu'
+if (input("1. UD-Datasets\n2. New Datasets")):
+    TRAIN_PATH = BASE_DIR / 'ud-datasets' / 'mt_mudt-ud-train.conllu'
+    TEST_PATH  = BASE_DIR / 'ud-1datasets' / 'mt_mudt-ud-test.conllu'
+else:
+    TRAIN_PATH = BASE_DIR / 'datasets' / 'mt_train.vrt'
+    TEST_PATH  = BASE_DIR / 'datasets' / 'mt_test.vrt'
+
 DUMP_PATH  = BASE_DIR / 'svm_pos_model.joblib'
 
 # Load data
@@ -64,7 +68,7 @@ def train_model():
 
     print("Saving model...")
     joblib.dump(svm_clf, DUMP_PATH)
-    joblib.dump(vec, BASE_DIR / 'vectorizer.joblib') # Added vectorizer as it is important to load POS tagger
+    joblib.dump(vec, BASE_DIR / 'vectorizer.joblib') 
 
     # Evaluation
     print("Accuracy:", accuracy_score(y_test, y_pred))
