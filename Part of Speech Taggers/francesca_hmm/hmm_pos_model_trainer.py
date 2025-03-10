@@ -2,20 +2,16 @@ from   sklearn.metrics import classification_report
 from   collections     import defaultdict, Counter
 from   pathlib         import Path
 import conllu
-import joblib
 
 BASE_DIR = Path(__file__).resolve().parent # Gets the base directory of the script itself
 
 # Paths - changed to work relatively to the local PC
-# Paths - changed to work relatively to the local PC
-if (input("1. UD-Datasets\n2. New Datasets")):
+if int(input("1. UD-Datasets\n2. New Datasets\n")) == 1:
     TRAIN_PATH = BASE_DIR / 'ud-datasets' / 'mt_mudt-ud-train.conllu'
     TEST_PATH  = BASE_DIR / 'ud-datasets' / 'mt_mudt-ud-test.conllu'
 else:
-    TRAIN_PATH = BASE_DIR / 'datasets' / 'mt_train.vrt'
-    TEST_PATH  = BASE_DIR / 'datasets' / 'mt_test.vrt'
-
-DUMP_PATH  = BASE_DIR / 'hmm_pos_model.joblib'
+    TRAIN_PATH = BASE_DIR / 'datasets' / 'train.vrt'
+    TEST_PATH  = BASE_DIR / 'datasets' / 'test.vrt'
 
 #loading data and parsing sentences (word-tag pairs)
 def parse_sentences(path):
