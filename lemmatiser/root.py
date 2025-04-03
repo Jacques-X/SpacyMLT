@@ -1,5 +1,6 @@
 import requests
 import csv
+import os
 
 def etympoligical_origin(token: str) -> int: # Implemented using lookup
     """
@@ -31,56 +32,58 @@ def etympoligical_origin(token: str) -> int: # Implemented using lookup
                 return 3
         return 0
 
-def filter_word_semitic(token: str) -> list:
+def filter_word_semitic(token: str) -> str:  # Return type changed to str
     """
-    Jġġati lura lista fejn il-vokali u l-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
-    Returns a list with all the vowels and duplicate consonants (+ some other filters) removed from the passed word.
+    Jġġati lura lista fejn il-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
+    Returns a string with duplicate consonants (+ some other filters) removed from the passed word.
     """
-    vowels         = ['a', 'e', 'i', 'o', 'u', 'ie', 'à']
+    char_list = []
     
-    char_list      = []
-    vowels_removed = []
-    filtered_token  = []
-
     # Take care of "ie", "għ" and "a'" to put them in one element
     i = 0
     while i < len(token):
-        if token[i:i+2] == "ie":
+        if i+1 < len(token) and token[i:i+2] == "ie":
             char_list.append("ie")
             i += 2
-        elif token[i:i+2] == "għ":
+        elif i+1 < len(token) and token[i:i+2] == "għ":
             char_list.append("għ")
             i += 2
-        elif token[i:i+2] == "a'":
+        elif i+1 < len(token) and token[i:i+2] == "a'":
             char_list.append("à")
+            i += 2
         else:
             char_list.append(token[i])
             i += 1
 
-    # Turn "'" at the end of a word into "għ"
+    # Turn " ' " at the end of a word into "għ"
     if char_list and char_list[-1] == "'": 
         char_list[-1] = "għ"
-
+        
     # Remove Duplicate Consonants
-    for i in range(len(vowels_removed)):
-        if i == 0 or vowels_removed[i] != vowels_removed[i-1]:
-            filtered_token.append(vowels_removed[i])
-
-    return filtered_token
+    filtered_token = []
+    for i in range(len(char_list)):
+        if i == 0 or char_list[i] != char_list[i-1]:
+            filtered_token.append(char_list[i])
+            
+    # Join the list into a string before returning
+    return "".join(filtered_token)
 
 def find_root_semitic(token: list) -> str:
     """
     Joħroġ għerq probabbli tal-kelmaa Maltija billi jingħata l-konsonanti tagħha biss.
     Extracts the probable root of a Maltese word given only its consonants.
     """
-
+    # Remove vowels
+    vowels = ["a", "e", "i", "o", "u", "à", "è", "ì", "ò", "ù", "ie"]
+    token = [char for char in token if char.lower() not in vowels]
+    
     # "m" had been removed but it is part of the root
     if len(token) <= 2:
         token.insert(0, "m")
-
+        
     if len(token) >= 4:
         token = token[:4]
-
+        
     return "".join(token)
 
 def import_affixes() -> list:
@@ -91,7 +94,9 @@ def import_affixes() -> list:
     prefixes = []
     suffixes = []
 
-    with open("affixes.csv", "r") as file:
+    current_dir = os.path.dirname(__file__)
+    affixes_file = os.path.join(current_dir, 'affixes.csv')
+    with open(affixes_file, 'r') as file:
         reader = csv.reader(file)
         next(reader)  # Skip the header row
         for row in reader:
@@ -131,7 +136,9 @@ def find_root(token: str) -> str:
     """
     root = ""
 
-    origin = etympoligical_origin(token)
+    origin = etympoligical_origin(token)    
+
+    print(token)
 
     if origin == 1: # Semitic
         filtered_token = filter_word_semitic(token)

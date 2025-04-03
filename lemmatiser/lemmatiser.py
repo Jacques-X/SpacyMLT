@@ -55,6 +55,7 @@ def lemmatise(sentence: str) -> list:
     features = [{"form": token} for token in filtered_tokens]
     features_vec = vectoriser.transform(features)
     pos_tags = model.predict(features_vec)
+    
     roots = [r.find_root(token) for token in filtered_tokens]
     tagged_sentence = list(zip(roots, pos_tags))
     return tagged_sentence
