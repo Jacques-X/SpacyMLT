@@ -132,13 +132,11 @@ def remove_affixes(token: str) -> str:
 
 def find_root(token: str) -> str:
     """
-    TO IMPLEMENT
+    Isib l-għerq/zokk morfemiku tal-kelma li jkun ingħata.
     """
     root = ""
 
     origin = etympoligical_origin(token)    
-
-    print(token)
 
     if origin == 1: # Semitic
         filtered_token = filter_word_semitic(token)

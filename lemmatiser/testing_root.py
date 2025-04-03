@@ -21,4 +21,4 @@ roots = [r.find_root(token) for token in filtered_tokens]
 tagged_text = list(zip(filtered_tokens, roots))
 error_words = [element[0] for element in tagged_text if "ERROR: could not find word origin" in element]
 
-print(error_words)
+print(tagged_text)
