@@ -1,4 +1,5 @@
 import requests
+import csv
 
 def etympoligical_origin(token: str) -> int: # Implemented using lookup
     """
@@ -60,23 +61,10 @@ def filter_word_semitic(token: str) -> list:
     if char_list and char_list[-1] == "'": 
         char_list[-1] = "għ"
 
-    # Remove Vowels
-    for i in char_list:
-        if i not in vowels:
-            vowels_removed.append(i)
-
     # Remove Duplicate Consonants
     for i in range(len(vowels_removed)):
         if i == 0 or vowels_removed[i] != vowels_removed[i-1]:
             filtered_token.append(vowels_removed[i])
-
-    # Nom mimmat (m is the first consonant)
-    if filtered_token and filtered_token[0] == 'm': 
-        filtered_token = filtered_token[1:] 
-
-    # Remove 'st'
-    if filtered_token[:2] == ['s', 't']:
-        filtered_token = filtered_token[2:]
 
     return filtered_token
 
@@ -86,20 +74,40 @@ def find_root_semitic(token: list) -> str:
     Extracts the probable root of a Maltese word given only its consonants.
     """
 
+    # "m" had been removed but it is part of the root
+    if len(token) <= 2:
+        token.insert(0, "m")
+
     if len(token) >= 4:
-        return "".join(token[:4])
+        token = token[:4]
 
     return "".join(token)
 
-def find_root_rom_eng(token: str) -> str:
+def import_affixes() -> list:
     """
-    Joħroġ iz-zokk morfemiku probabbli tal-kelma Maltija..
+    Jimportja prefixes and suffixes minn CSV file.
+    Imports prefixes and suffixes from a CSV file.
+    """
+    prefixes = []
+    suffixes = []
+
+    with open("affixes.csv", "r") as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the header row
+        for row in reader:
+            suffixes.append(row[0])
+            prefixes.append(row[1])
+
+    return prefixes, suffixes
+
+def remove_affixes(token: str) -> str:
+    """
+    Joħroġ iz-zokk morfemiku probabbli tal-kelma Maltija.
     Extracts the probable root of a Maltese.
     """
     root = ""
 
-    prefixes = ["ik", "jik", "j", "ip", "jip"]
-    suffixes = ["iet", "i", "joni", "ent", "a", "at", "anti", "aw", "i", "atur", "tat", "azzjoni"]
+    prefixes, suffixes = import_affixes()
 
     if len(token) >= 4:
         for prefix in prefixes:
@@ -127,10 +135,11 @@ def find_root(token: str) -> str:
 
     if origin == 1: # Semitic
         filtered_token = filter_word_semitic(token)
+        filtered_token = remove_affixes(filtered_token)
         root = find_root_semitic(filtered_token)
         return root
     elif origin == 2 or origin == 3: # Romance and English
-        root = find_root_rom_eng(token)
+        root = remove_affixes(token)
         return root 
     elif origin == 4: # Article
         return token

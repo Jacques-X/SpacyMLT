@@ -9,8 +9,13 @@ Imbagħad tippreokkupani daqsxejn ukoll il-problema tal-konsumiżmu u ta' l-awto
 Naturalment anki l-problema li min jiġi f'din ir-responsabbilta ma jitlagħlux għal rasu, għaliex din ukoll tendenza daqsxejn taċ-ċokon, ta' kollox i ppersonalizzat.
 """
 
+print("Tokenising...")
 tokens = mlt.tokenise(text)
+
+print("Normalising...")
 filtered_tokens = l.normalise(tokens)
+
+print("Finding roots...")
 roots = [r.find_root(token) for token in filtered_tokens]
 
 tagged_text = list(zip(filtered_tokens, roots))

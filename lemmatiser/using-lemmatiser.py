@@ -1,6 +1,6 @@
 import lemmatiser as l
 
-string = "marad"
+string = "misraħ"
 
 lemmatised_tokens = l.lemmatise(string)
 print()
