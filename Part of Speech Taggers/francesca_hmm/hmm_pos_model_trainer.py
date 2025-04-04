@@ -2,8 +2,10 @@ from   sklearn.metrics import classification_report
 from   collections     import defaultdict, Counter
 from   pathlib         import Path
 import conllu
+import joblib
 
 BASE_DIR = Path(__file__).resolve().parent # Gets the base directory of the script itself
+MODEL_PATH = BASE_DIR / "hmm_pos_model.joblib"
 
 # Paths - changed to work relatively to the local PC
 if int(input("1. UD-Datasets\n2. New Datasets\n")) == 1:
@@ -16,12 +18,33 @@ else:
 #loading data and parsing sentences (word-tag pairs)
 def parse_sentences(path):
     parsed_sentences = []
-    with open(path, "r", encoding="utf-8") as f:
-        for sentence in conllu.parse_incr(f):
-            tokens = [token["form"] for token in sentence]
-            pos_tags = [token["upos"] for token in sentence]
-            parsed_sentences.append((tokens, pos_tags))
+
+    #for .conllu files
+    if path.suffix == ".conllu":
+        with open(path, "r", encoding="utf-8") as f:
+            for sentence in conllu.parse_incr(f):
+                tokens = [token["form"] for token in sentence]
+                pos_tags = [token["upos"] for token in sentence]
+                parsed_sentences.append((tokens, pos_tags))
+        return parsed_sentences
+    
+    elif path.suffix == ".vrt":
+        with open(path, "r", encoding="utf-8") as f:
+            sentence_tokens, sentence_tags = [], []
+            for line in f:
+                parts = line.strip().split()
+                if len(parts) >= 2:
+                    sentence_tokens.append(parts[0])
+                    sentence_tags.append(parts[1])
+                elif sentence_tokens and sentence_tags:
+                    parsed_sentences.append((sentence_tokens, sentence_tags))
+                    sentence_tokens, sentence_tags = [], []
+            if sentence_tokens and sentence_tags:
+                parsed_sentences.append((sentence_tokens, sentence_tags))
+    else:
+        raise ValueError("Unknown Supported Fiile Format")
     return parsed_sentences
+
 
 #train HMM model
 def train_hmm(train_data):
@@ -115,6 +138,10 @@ def main():
 
     print("Training HMM model...")
     initial_probs, transition_probs, emission_probs, states = train_hmm(train_sentences)
+
+    print("Saving model...")
+    joblib.dump((initial_probs, transition_probs, emission_probs, list(states)), MODEL_PATH)
+
 
     print("Evaluating model...")
     evaluate_model(test_sentences, states, initial_probs, transition_probs, emission_probs)
