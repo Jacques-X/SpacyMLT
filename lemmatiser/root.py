@@ -2,7 +2,7 @@ import requests
 import csv
 import os
 
-def etympoligical_origin(token: str) -> int: # Implemented using lookup
+def etymoligical_origin(token: str) -> int: # Implemented using lookup
     """
     Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliža.
     Checks if a word is of Semitic, Romance, or English origin.
@@ -136,7 +136,7 @@ def find_root(token: str) -> str:
     """
     root = ""
 
-    origin = etympoligical_origin(token)    
+    origin = etymoligical_origin(token)    
 
     if origin == 1: # Semitic
         filtered_token = filter_word_semitic(token)
