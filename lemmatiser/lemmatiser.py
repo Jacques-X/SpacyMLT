@@ -52,6 +52,9 @@ def lemmatise(sentence: str) -> list:
     tokens = mlt.tokenise(sentence)
     filtered_tokens = filter_tokens(tokens)
 
+    print(filtered_tokens)
+    print("\n\n")
+
     features = [{"form": token} for token in filtered_tokens]
     features_vec = vectoriser.transform(features)
     pos_tags = model.predict(features_vec)
