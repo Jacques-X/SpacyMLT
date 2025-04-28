@@ -18,22 +18,31 @@ class BERTuFillMaskComponent:
         self.fill_mask = fill_mask  
 
     def __call__(self, doc):
-        #Replaces each token with [MASK] and predicts possible replacements.
+        text = doc.text
+
+        #if the user manually added a [MASK], treat it as a direct fill-mask request
+        if "[MASK]" in text:
+            try:
+                predictions = self.fill_mask(text)
+                #only return predictions for the inserted [MASK]
+                doc._.bert_predictions = {
+                    "[MASK]": [pred["token_str"] for pred in predictions[:5]]
+                }
+            except Exception as e:
+                doc._.bert_predictions = {"[MASK]": [f"Error: {str(e)}"]}
+            return doc
+
+        #otherwise, auto-mask each word like before
         tokens = [token.text for token in doc]
         results = {}
 
-        #process each word by masking it one at a time
         for i in range(len(tokens)):
             masked_sentence = tokens[:i] + ["[MASK]"] + tokens[i+1:]
             masked_text = " ".join(masked_sentence)
 
-            #get predictions from BERTu
             predictions = self.fill_mask(masked_text)
-
-            #store top predictions for the masked word
             results[tokens[i]] = [pred["token_str"] for pred in predictions[:5]]
 
-        #store predictions in the doc's custom attribute
         doc._.bert_predictions = results
         return doc
 
@@ -44,13 +53,27 @@ Doc.set_extension("bert_predictions", default={}, force=True)
 nlp = spacy.blank("xx")
 nlp.add_pipe("bertu_fill_mask", last=True)
 
-'''# Test the model with a Maltese sentence
-text = "Il-qattusa qeda [MASK] fil-ġnien."
-doc = nlp(text)
+#test 1 - automasking every word
+print("\n- - Auto-Masking Every Word - -")
+text1 = "Il-qattusa qeda torqod fil-ġnien."
+doc1 = nlp(text1)
 
-#print masked word predictions
-for word, predictions in doc._.bert_predictions.items():
-    print(f"Word: {word} → Predictions: {predictions}")'''
+for word, predictions in doc1._.bert_predictions.items():
+    print(f"Word: {word} → Predictions: {predictions}")
 
-#save the spaCy model
+#test 2+3 - a specific word masked
+print("\n- - Specific [MASK] Prediction - -")
+text2 = "Il-[MASK] ħabbar il-proposti ġodda"
+text3 = "L-[MASK] ħareġ mill-iskola u mar jiekol"
+doc2 = nlp(text2)
+doc3 = nlp(text3)
+
+for word, predictions in doc2._.bert_predictions.items():
+    print(f"Masked Token: {word} → Predictions: {predictions}")
+
+
+for word, predictions in doc3._.bert_predictions.items():
+    print(f"Masked Token: {word} → Predictions: {predictions}")
+
+#save to disk
 nlp.to_disk("spacy_bertu_fill_mask")

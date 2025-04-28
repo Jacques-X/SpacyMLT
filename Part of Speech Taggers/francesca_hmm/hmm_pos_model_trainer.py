@@ -4,7 +4,7 @@ from   pathlib         import Path
 import conllu
 import joblib
 
-BASE_DIR = Path(__file__).resolve().parent # Gets the base directory of the script itself
+BASE_DIR = Path(__file__).resolve().parent #gets the base directory of the script itself
 MODEL_PATH = BASE_DIR / "hmm_pos_model.joblib"
 
 # Paths - changed to work relatively to the local PC
