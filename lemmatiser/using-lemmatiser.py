@@ -1,7 +1,7 @@
 import lemmatiser as l
 
 text =  """
-        Din is-sentenza qiegħda hawn sabiex nara kemm jaħdem sew dan l-lemmatiser li bnejna fi grupp.
+        Dan ik-kliem qiegħed hawn sabiex nara kemm jaħdem sew dan l-lemmatiser li bnejna fi grupp.
         """
 
 # Call the lemmatise function from the lemmatiser module

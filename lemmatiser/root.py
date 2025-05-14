@@ -192,11 +192,8 @@ def find_root_semitic(token: str) -> str:
     consonants = extract_consonants(token)
     
     # Root determination based on number of consonants
-    if len(consonants) == 0:
+    if len(consonants) == 0 or len(consonants) == 1:
         return token  # Return original if no consonants found
-    elif len(consonants) == 1:
-        # Too few consonants for a valid root - likely an error
-        return consonants[0] + consonants[0] + consonants[0]  # Triplicate single consonant as fallback
     elif len(consonants) == 2:
         # For two-consonant words, try to determine if there's an elided root letter
         # Common in Maltese are weak verbs that lose middle/final radical
@@ -240,7 +237,7 @@ def find_root(token: str, pos_tag: str) -> str:
         token = token[1:]
     origin = etymoligical_origin(token)    
 
-    if origin == 1 and (pos_tag == "VERB" or pos_tag == "NOUN" or pos_tag == "ADJ" or pos_tag == "ADV"): # Semitic
+    if origin == 1 and (pos_tag == "VERB" or pos_tag == "NOUN" or pos_tag == "ADJ" or pos_tag == "ADV" or pos_tag == "AUX"): # Semitic
         filtered_token = filter_word_semitic(token)
         filtered_token = remove_affixes(filtered_token)
         root = find_root_semitic(filtered_token)

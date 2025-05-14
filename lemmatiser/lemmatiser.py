@@ -18,30 +18,6 @@ def normalise(tokens: list) -> list:
     punctuation = {'.', ',', ';', ':', '!', '?'}
     return [token.lower() for token in tokens if token not in punctuation]
 
-def whole_plural_filter(token: str) -> str:
-    """
-    Ineħħi l-formi plurali tal-kelma meta dan hu plural sħiħ.
-    Filter out plural forms of a word when it is a "whole" plural.
-    """
-    plural_forms = ['ijiet', 'jiet', 'i', 's']
-    for form in plural_forms:
-        if len(token) > 4: # Prevent removing i/s which are not plural
-            if token.endswith(form):
-                return token[:-len(form)]
-    return token
-
-def broken_plural_filter(token: str) -> str:
-    """
-    Ineħħii l-formi plurali tal-kelma meta dan hu plural miksur.
-    Filter out plural forms of a word when it is a "broken" plural.
-    """
-    # Implementazzjoni meħtieġa
-    return token  # Jekk ma jsibx plural, irritorna l-kelma kif inhi
-
-def filter_tokens(tokens: list) -> list:
-    tokens = normalise(tokens)
-    return [broken_plural_filter(whole_plural_filter(token)) for token in tokens]
-
 def lemmatise(sentence: str) -> list:
     """
     Lemmatizza s-sentenza b'sett ta' regoli.
@@ -50,15 +26,14 @@ def lemmatise(sentence: str) -> list:
     print("Lemmatising...")
 
     tokens = mlt.tokenise(sentence)
-    filtered_tokens = filter_tokens(tokens)
 
-    print(filtered_tokens)
+    print(tokens)
     print("\n\n")
 
-    features = [{"form": token} for token in filtered_tokens]
+    features = [{"form": token} for token in tokens]
     features_vec = vectoriser.transform(features)
     pos_tags = model.predict(features_vec)
     
-    roots = [r.find_root(token, pos_tag) for token, pos_tag in zip(filtered_tokens, pos_tags)]
+    roots = [r.find_root(token, pos_tag) for token, pos_tag in zip(tokens, pos_tags)]
     tagged_sentence = list(zip(roots, pos_tags))
     return tagged_sentence
