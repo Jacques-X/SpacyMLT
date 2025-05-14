@@ -1,11 +1,16 @@
 import lemmatiser as l
 
-text = """
-    Imbagħad tippreokkupani daqsxejn ukoll il-problema tal-konsumiżmu u ta' l-awtoriżmu li diġa hija karatteristika ta' dan is-seklu u nistenna li se tkompli taċċenna ruħha fil-millennju l-ġdid. Naturalment ma tistax iżżomm lura ċertu progress u ċerti kumditajiet, imma naħseb hu serju jekk wieħed jittraskura u jestranja ruħu mis-sempliċitajiet umani, u tVambjent naturali fil-komunita wkoll.
-    """
+text =  """
+        Din is-sentenza qiegħda hawn sabiex nara kemm jaħdem sew dan l-lemmatiser li bnejna fi grupp.
+        """
 
+# Call the lemmatise function from the lemmatiser module
 lemmatised_tokens = l.lemmatise(text)
+
+# Print the original text and the lemmatised tokens
 print()
+print("Original Text:")
 print(text)
 print()
+print("Lemmatised Tokens (Root, POS_tag):")
 print(lemmatised_tokens)

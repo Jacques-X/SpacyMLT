@@ -20,7 +20,7 @@ def etymoligical_origin(token: str) -> int: # Implemented using lookup
         return 4
     else:
         url = f"https://en.wiktionary.org/wiki/{token}#Maltese" # force it to seach in the Maltese section
-        response = requests.get(url, timeout=5)  # timeout to prevent hanging
+        response = requests.get(url, timeout=10)  # timeout to prevent hanging
 
         if response.status_code == 200:
             text = response.text
@@ -34,7 +34,7 @@ def etymoligical_origin(token: str) -> int: # Implemented using lookup
 
 def filter_word_semitic(token: str) -> str:  # Return type changed to str
     """
-    Jġġati lura lista fejn il-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
+    Jgħati lura lista fejn il-konsonanti doppji (u xi filtri oħra) huma mneħħija mill-kelma li ġiet ingħatat.
     Returns a string with duplicate consonants (+ some other filters) removed from the passed word.
     """
     char_list = []
@@ -229,7 +229,7 @@ def remove_affixes(token: str) -> str:
     prefixes, suffixes = import_affixes()
     return remove_affixes_recursive(token, prefixes, suffixes)
 
-def find_root(token: str) -> str:
+def find_root(token: str, pos_tag: str) -> str:
     """
     Isib l-għerq/zokk morfemiku tal-kelma li jkun ingħata.
     Finds the root/morphemic stem of the given word.
@@ -240,7 +240,7 @@ def find_root(token: str) -> str:
         token = token[1:]
     origin = etymoligical_origin(token)    
 
-    if origin == 1: # Semitic
+    if origin == 1 and (pos_tag == "VERB" or pos_tag == "NOUN" or pos_tag == "ADJ" or pos_tag == "ADV"): # Semitic
         filtered_token = filter_word_semitic(token)
         filtered_token = remove_affixes(filtered_token)
         root = find_root_semitic(filtered_token)
@@ -252,6 +252,6 @@ def find_root(token: str) -> str:
     elif origin == 4: # Article
         return token
     elif origin == 0: # Unknown
-        return "ERROR: could not find word origin"
+        return token
     
-    return "ERROR: something went wrong"
+    return token
