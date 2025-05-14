@@ -193,7 +193,7 @@ def find_root_semitic(token: str) -> str:
     
     # Root determination based on number of consonants
     if len(consonants) == 0 or len(consonants) == 1:
-        return token  # Return original if no consonants found
+        return token  # Return original if no/one consonant/s found
     elif len(consonants) == 2:
         # For two-consonant words, try to determine if there's an elided root letter
         # Common in Maltese are weak verbs that lose middle/final radical
