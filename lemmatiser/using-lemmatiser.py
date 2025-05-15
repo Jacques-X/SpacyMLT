@@ -1,7 +1,7 @@
 import lemmatiser as l
 
 text =  """
-        Is-sistema tal-booking għall-Blue Lagoon reġgħet daħlet fis-seħħ. Dan wara li l-Qorti rrifjutat it-talba minn operaturi tad-dgħajjes biex twaqqafha għax allegaw diskriminazzjoni.
+        Il-gvern qassam miljun ewro lil għadd ta’ każini madwar Malta sabiex ikunu jistgħu iwettqu proġetti ta’ fejda għall-komunità jew għall-avvanz mużikali, pirotekniku jew fl-arti tal-armar.
         """
 
 # Call the lemmatise function from the lemmatiser module
