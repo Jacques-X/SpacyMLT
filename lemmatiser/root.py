@@ -1,36 +1,114 @@
+from bs4 import BeautifulSoup
 import requests
 import csv
 import os
+import re
 
-def etymoligical_origin(token: str) -> int: # Implemented using lookup
+def etymological_origin(token: str) -> int:
     """
-    Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanzza jew Ingliża.
-    Checks if a word is of Semitic, Romance, or English origin.
+    Jivverifika jekk il-kelma hix ta' oriġini Semitica, Rumanza jew Ingliża billi tanalizza
+    t-taqsima tal-etimoloġija fuq il-Wiktionary.
+    Checks if a word is of Semitic, Romance, or English origin by analyzing
+    the etymology section on Wiktionary.
 
-    0 -> Unknown
-    1 -> Semitic
-    2 -> Romance
-    3 -> English
-    4 -> Article
+    Args:
+        token: The word (string) to check.
+
+    Returns:
+        int:
+            0 -> Unknown or error
+            1 -> Semitic
+            2 -> Romance
+            3 -> English
+            4 -> Article
     """
+    token = token.strip()
+    if not token:
+        return 0 # Empty token
 
     articles = ['il-', 'is-', 'id-', 'in-', 'iz-', 'iż-', 'l-', 's-', 'd-', 'n-', 'z-', 'ż-', 'għal-', 'għall-', 'tal-', 'tal-']
-
-    if token in articles:
+    normalized_token = token.lower()
+    if normalized_token in articles or f"{normalized_token}-" in articles:
         return 4
-    else:
-        url = f"https://en.wiktionary.org/wiki/{token}#Maltese" # force it to seach in the Maltese section
-        response = requests.get(url, timeout=10)  # timeout to prevent hanging
 
-        if response.status_code == 200:
-            text = response.text
-            if "Semitic" in text or "Arabic" in text or "Hebrew" in text or "Moroccan Arabic" in text:
-                return 1
-            elif "Romance" in text or "Latin" in text or "Italian" in text or "Sicilian" in text:
-                return 2
-            elif "English" in text or "Old English" in text:
-                return 3
-        return 0
+    # Construct the URL, forcing it to the Maltese section
+    url = f"https://en.wiktionary.org/wiki/{token}#Maltese"
+    headers = { 
+        'User-Agent': 'MalteseEtymologyChecker/1.0 (https://example.com/bot; your_email@example.com)'
+    }
+
+    try:
+        response = requests.get(url, timeout=10, headers=headers)
+        response.raise_for_status() 
+    except requests.exceptions.RequestException as e:
+        return 0 # Network error or HTTP error
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Find the Maltese language section
+    maltese_section_header = soup.find('span', {'class': 'mw-headline', 'id': 'Maltese'})
+    if not maltese_section_header:
+        maltese_section_header = soup.find(lambda tag: tag.name in ['h1','h2','h3'] and tag.get('id') == 'Maltese' and 'mw-headline' in tag.get('class', []))
+        if not maltese_section_header:
+            maltese_headers = soup.find_all(['h1', 'h2', 'h3', 'h4'], string=re.compile(r'Maltese', re.I))
+            if maltese_headers:
+                maltese_section_header = maltese_headers[0].find('span', class_='mw-headline') 
+            if not maltese_section_header:
+                return 0
+
+    etymology_text = ""
+    current_element = maltese_section_header.parent 
+
+    while current_element:
+        current_element = current_element.find_next_sibling()
+        if current_element is None:
+            break
+        if current_element.name == 'h2':
+            break
+
+        etymology_header_span = current_element.find('span', {'class': 'mw-headline', 'id': lambda x: x and x.startswith('Etymology')})
+
+        if etymology_header_span:
+            etym_content_element = current_element.find_next_sibling()
+            while etym_content_element:
+                if etym_content_element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+                    is_another_etymology = etym_content_element.find('span', {'class': 'mw-headline', 'id': lambda x: x and x.startswith('Etymology')})
+                    if not (etym_content_element.name >= current_element.name and is_another_etymology) : 
+                         break
+
+
+                if etym_content_element.name == 'p': 
+                    etymology_text += etym_content_element.get_text(separator=' ', strip=True) + " "
+                elif etym_content_element.name in ['ul', 'ol', 'dl']: 
+                    etymology_text += etym_content_element.get_text(separator=' ', strip=True) + " "
+
+                etym_content_element = etym_content_element.find_next_sibling()
+
+    if not etymology_text:
+        maltese_content_element = maltese_section_header.parent.find_next_sibling()
+        temp_text = ""
+        while maltese_content_element and maltese_content_element.name != 'h2':
+            temp_text += maltese_content_element.get_text(separator=' ', strip=True) + " "
+            maltese_content_element = maltese_content_element.find_next_sibling()
+        if not temp_text:
+            etymology_text = soup.get_text(separator=' ', strip=True)
+        else:
+            etymology_text = temp_text
+
+    etymology_text_lower = etymology_text.lower()
+
+    semitic_keywords = ["semitic", "arabic", "sħem", "għarbi", "aramaic", "phoenician", "hebrew", "lixandra", "moroccan arabic"]
+    romance_keywords = ["romance", "latin", "italian", "sicilian", "norman", "french", "catalan", "spanish", "rumanz", "latin", "taljan", "sqalli"]
+    english_keywords = ["english", "old english", "middle english", "ingliż"]
+
+    if any(keyword in etymology_text_lower for keyword in english_keywords):
+        return 3
+    elif any(keyword in etymology_text_lower for keyword in romance_keywords):
+        return 2
+    elif any(keyword in etymology_text_lower for keyword in semitic_keywords):
+        return 1
+    else:
+        return 0 # Unknown origin
 
 def filter_word_semitic(token: str) -> str:  # Return type changed to str
     """
@@ -235,11 +313,12 @@ def find_root(token: str, pos_tag: str) -> str:
 
     if token.startswith('i'):
         token = token[1:]
-    origin = etymoligical_origin(token)    
+    origin = etymological_origin(token)    
 
-    if origin == 1 and (pos_tag == "VERB" or pos_tag == "NOUN" or pos_tag == "ADJ" or pos_tag == "ADV" or pos_tag == "AUX"): # Semitic
+    if origin == 1 and (pos_tag == "VERB" or pos_tag == "NOUN" or pos_tag == "ADJ" or pos_tag == "AUX"): # Semitic
         filtered_token = filter_word_semitic(token)
         filtered_token = remove_affixes(filtered_token)
+        print(filtered_token + "\n")
         root = find_root_semitic(filtered_token)
         root = (root + " " + str(origin))
         return root
