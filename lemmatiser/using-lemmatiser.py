@@ -1,7 +1,7 @@
 import lemmatiser as l
 
 text =  """
-        Il-gvern qassam miljun ewro lil għadd ta’ każini madwar Malta sabiex ikunu jistgħu iwettqu proġetti ta’ fejda għall-komunità jew għall-avvanz mużikali, pirotekniku jew fl-arti tal-armar.
+        Il-misraħ tar-raħal kien armat għall-festa.
         """
 
 # Call the lemmatise function from the lemmatiser module
