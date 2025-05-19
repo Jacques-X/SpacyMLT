@@ -3,14 +3,14 @@ import joblib
 from pathlib import Path
 
 # Paths
-SVM_BASE_PATH = Path(__file__).resolve().parent.parent / 'svm_pos'
+SVM_BASE_PATH = Path(__file__).resolve().parent.parent / 'Part of Speech Taggers/jacques_svm'
 
 # Load the vectorizer and model
 vectorizer = joblib.load(SVM_BASE_PATH / 'vectorizer.joblib')
 model = joblib.load(SVM_BASE_PATH / 'svm_pos_model.joblib')
 
 # Sentence to tag
-sentence = "Jien għandi ħafna xogħol."
+sentence = "Dan test għal waqt il-video tal-proġett tal-Universtità ta' Malta."
 print(f"\nSentence to tag: {sentence}")
 
 # Step 1: Tokenization
